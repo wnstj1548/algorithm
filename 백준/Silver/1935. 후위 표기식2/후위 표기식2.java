@@ -47,7 +47,8 @@ public class Main {
             }
         }
 
-        System.out.printf("%.2f", stack.pop());
+        String formattedValue = String.format("%.2f", stack.pop());
+        bw.write(formattedValue);
 
         bw.flush();
         br.close();
