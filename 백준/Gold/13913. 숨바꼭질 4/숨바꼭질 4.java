@@ -1,66 +1,85 @@
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Stack;
+import java.io.*;
+import java.util.*;
 
-public class Main {
-    static int[] parent;
-    static int[] time;
+class Main {
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int k = sc.nextInt();
+    static int[] arr;
+    static int[] before;
 
-        if (n == k) {
-            System.out.println(0);
-            System.out.println(n);
-        } else {
-            bfs(n, k);
-            System.out.println(time[k]-1);
+    static void bfs(int start, int end) {
 
-            Stack<Integer> stack = new Stack<>();
-            stack.push(k);
-            int index = k;
-            while (index!=n){
-                stack.push(parent[index]);
-                index = parent[index];
+        arr = new int[100001];
+        before = new int[100001];
+
+        Arrays.fill(arr, -1);
+        arr[start] = 0;
+
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(start);
+
+        while(!queue.isEmpty()){
+            int now = queue.poll();
+
+            if(now == end) {
+                return;
             }
-            StringBuilder sb = new StringBuilder();
-            while (!stack.isEmpty()){
-                sb.append(stack.pop()).append(" ");
+
+            if(now + 1 <= 100000 && arr[now+1] == -1) {
+                arr[now+1] = arr[now] + 1;
+                before[now+1] = now;
+                queue.add(now+1);
             }
-            System.out.println(sb);
+
+            if(0 <= now - 1 && arr[now-1] == -1) {
+                arr[now-1] = arr[now] + 1;
+                before[now-1] = now;
+                queue.add(now-1);
+            }
+
+            if(now * 2 <= 100000 && arr[now*2] == -1) {
+                arr[now*2] = arr[now] + 1;
+                before[now*2] = now;
+                queue.add(now*2);
+            }
         }
     }
 
-    public static void bfs(int n, int k) {
-        Queue<Integer> q = new LinkedList<>();
-        parent = new int[100001];
-        time = new int[100001];
-        q.offer(n);
-        time[n] = 1;
+    public static void main(String[] args) throws Exception {
 
-        while (!q.isEmpty()) {
-            Integer now = q.poll();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-            if (now == k) return;
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int start = Integer.parseInt(st.nextToken());
+        int end = Integer.parseInt(st.nextToken());
 
-            if (now * 2 <= 100000 && time[now * 2] == 0) {
-                time[now * 2] = time[now] + 1;
-                parent[now * 2] = now;
-                q.add(now * 2);
+        if(start == end) {
+            bw.write("0\n" + start + "\n");
+            bw.flush();
+            bw.close();
+            br.close();
+        } else {
+            bfs(start, end);
+
+            bw.write(arr[end] + "\n");
+
+            Stack<Integer> stack = new Stack<>();
+            stack.push(end);
+
+            int temp = end;
+
+            while(temp != start) {
+                stack.push(before[temp]);
+                temp = before[temp];
             }
-            if (now + 1 <= 100000 && time[now + 1] == 0) {
-                time[now + 1] = time[now] + 1;
-                parent[now + 1] = now;
-                q.add(now + 1);
+
+            while(!stack.isEmpty()) {
+                bw.write(stack.pop() + " ");
             }
-            if (now - 1 >= 0 && time[now - 1] == 0) {
-                time[now - 1] = time[now] + 1;
-                parent[now - 1] = now;
-                q.add(now - 1);
-            }
+
+            bw.flush();
+            bw.close();
+            br.close();
         }
     }
 }
