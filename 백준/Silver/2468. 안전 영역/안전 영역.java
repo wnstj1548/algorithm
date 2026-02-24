@@ -1,75 +1,69 @@
 import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
 
-    static int[][] graph;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
     static int n;
+    static int[][] adj;
     static boolean[][] visited;
-    static int[][] pos = new int[][]{{1,0}, {-1,0}, {0,1}, {0,-1}};
+    static int[] dx = {1, 0, 0, -1};
+    static int[] dy = {0, 1, -1, 0};
+    static int height = 0;
 
-    public static void bfs(int x, int y, int h) {
+    static void dfs(int y, int x) {
 
-        Queue<int[]> queue = new LinkedList<>();
-        queue.add(new int[]{x,y});
-        visited[x][y] = true;
+        visited[y][x] = true;
 
-        while(!queue.isEmpty()) {
-            int[] arr = queue.poll();
-            int nowX = arr[0];
-            int nowY = arr[1];
+        for(int i = 0; i < 4; i++) {
+            int ny = y + dy[i];
+            int nx = x + dx[i];
 
-            for(int i = 0; i < 4; i++) {
-                int nx = nowX + pos[i][0];
-                int ny = nowY + pos[i][1];
-
-                if(nx >= 0 && nx < n && ny >= 0 && ny < n && graph[nx][ny] > h && !visited[nx][ny]) {
-                    visited[nx][ny] = true;
-                    queue.add(new int[]{nx, ny});
-                }
-            }
+            if(nx < 0 || ny < 0 || nx >= n || ny >= n) continue;
+            if(visited[ny][nx] || adj[ny][nx] <= height) continue;
+            dfs(ny, nx);
         }
     }
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        int maxCount = Integer.MIN_VALUE;
+        int maxHeight = Integer.MIN_VALUE;
 
         n = Integer.parseInt(br.readLine());
-
-        graph = new int[n][n];
-        int maxHeight = 0;
+        int count = 0;
+        adj = new int[n][n];
+        visited = new boolean[n][n];
 
         for(int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             for(int j = 0; j < n; j++) {
-                graph[i][j] = Integer.parseInt(st.nextToken());
-                maxHeight = Math.max(maxHeight, graph[i][j]);
+                adj[i][j] = Integer.parseInt(st.nextToken());
+                if(adj[i][j] > maxHeight) maxHeight = adj[i][j];
             }
         }
 
-        int maxZone = 0;
-
-        for(int k = 0; k <= maxHeight; k++) {
-
-            int count = 0;
-            visited = new boolean[n][n];
-
+        for(int k = 0; k < maxHeight; k++) {
+            count = 0;
+            for(int ii = 0; ii < n; ii++) {
+                Arrays.fill(visited[ii], false);
+            }
             for(int i = 0; i < n; i++) {
                 for(int j = 0; j < n; j++) {
-                    if(!visited[i][j] && graph[i][j] > k) {
-                        bfs(i, j, k);
+                    if(!visited[i][j] && adj[i][j] > height) {
                         count++;
+                        dfs(i,j);
                     }
                 }
             }
-
-            maxZone = Math.max(maxZone, count);
+            if(count > maxCount) maxCount = count;
+            height++;
         }
 
-        bw.write(maxZone + "\n");
-
+        bw.write(maxCount + "");
+        bw.newLine();
         bw.flush();
         bw.close();
         br.close();
