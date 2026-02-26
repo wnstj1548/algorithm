@@ -41,7 +41,7 @@ public class Main {
             int y = virus[0];
             int x = virus[1];
 
-            dfs(y, x);
+            if(!visited[y][x]) dfs(y, x);
         }
 
         int count = 0;
