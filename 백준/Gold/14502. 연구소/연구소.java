@@ -14,34 +14,20 @@ public class Main {
     static List<int[]> wallList = new ArrayList<>();
     static boolean[][] visited;
 
-    public static void combi(List<int[]> resultList, List<int[]> wallList, boolean[][] combiVisited) {
+    public static void combi(int depth, int start, List<int[]> wallList) {
 
-        if(resultList.size() == 3) {
-            for(int[] addWall : resultList) {
-                adj[addWall[0]][addWall[1]] = 1;
-            }
-
+        if(depth == 3) {
             max = Math.max(max, solve());
-
-            for(int[] addWall : resultList) {
-                adj[addWall[0]][addWall[1]] = 0;
-            }
-
             return;
         }
 
-        for(int[] wallArr : wallList) {
-            
-            int y = wallArr[0];
-            int x = wallArr[1];
+        for(int i = start; i < wallList.size(); i++) {
+            int y = wallList.get(i)[0];
+            int x = wallList.get(i)[1];
 
-            if(combiVisited[y][x]) continue;
-
-            combiVisited[y][x] = true;
-            resultList.add(new int[]{y, x});
-            combi(resultList, wallList, combiVisited);
-            resultList.remove(resultList.size() -1);
-            combiVisited[y][x] = false;
+            adj[y][x] = 1;
+            combi(depth + 1, i + 1, wallList);
+            adj[y][x] = 0;
         }
     }
 
@@ -101,7 +87,7 @@ public class Main {
             }
         }
 
-        combi(new ArrayList<>(), wallList, new boolean[n][m]);
+        combi(0, 0, wallList);
 
         bw.write(max + "");
         bw.flush();
