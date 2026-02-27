@@ -1,42 +1,44 @@
 import java.io.*;
-import java.util.Stack;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
 
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
         int n = Integer.parseInt(br.readLine());
-
+        int[] adj = new int[n];
+        int[] result = new int[n];
         Stack<Integer> stack = new Stack<>();
-        int[] intArray = new int[n];
 
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        for(int i = 0; i<n; i++) {
-            intArray[i] = Integer.parseInt(st.nextToken());
+        for(int i = 0; i < n; i++) {
+            adj[i] = Integer.parseInt(st.nextToken());
         }
 
-        for(int i = 0; i<n; i++) {
+        for(int i = n-1; i >= 0; i--) {
 
-            while(!stack.isEmpty() && intArray[stack.peek()] < intArray[i]) {
-                intArray[stack.pop()] = intArray[i];
+            while(!stack.isEmpty() && stack.peek() <= adj[i]) {
+                stack.pop();
             }
 
-            stack.push(i);
+            if(stack.isEmpty()) {
+                result[i] = -1;
+            } else {
+                result[i] = stack.peek();
+            }
+
+            stack.push(adj[i]);
         }
 
-        while(!stack.isEmpty()) {
-            intArray[stack.pop()] = -1;
+        for(int i : result) {
+            bw.write(i + " ");
         }
 
-        for(int i = 0; i<intArray.length; i++) {
-            bw.write(intArray[i] + " ");
-        }
-
+        bw.newLine();
         bw.flush();
         br.close();
         bw.close();
